@@ -1,13 +1,13 @@
 package com.example.teststorymaker
 
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.teststorymaker.databinding.FragmentTopNavBinding
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -37,7 +37,10 @@ class TopNavFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding= FragmentTopNavBinding.inflate(layoutInflater,container,false)
-
+        binding.homeBtn.setOnClickListener {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+        }
 //        binding.homeBtn.setBackgroundColor(
 //            Color.parseColor("#FF0000"))
         // Inflate the layout for this fragment

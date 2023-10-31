@@ -12,6 +12,17 @@
         android:theme="@style/Theme.TestStoryMaker"
         tools:targetApi="31">
         <activity
+            android:name=".MyStories"
+            android:exported="false" />
+        <activity
+            android:name=".StoryProgress"
+            android:exported="false" />
+        <activity
+            android:name=".StoryInformation"
+            android:exported="false"
+            android:label="@string/title_activity_story_information"
+            android:theme="@style/Theme.TestStoryMaker.NoActionBar" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
