@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.teststorymaker.databinding.RowBinding
 
-class MyStoriesAdapter (val items:ArrayList<dataMyStories>)
+class MyStoriesAdapter (val items:ArrayList<MyStoryData>)
     : RecyclerView.Adapter<MyStoriesAdapter.ViewHolder>(){
     inner class ViewHolder(val binding: RowBinding)
         : RecyclerView.ViewHolder(binding.root)

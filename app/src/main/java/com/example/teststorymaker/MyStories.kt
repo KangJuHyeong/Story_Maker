@@ -3,14 +3,16 @@ package com.example.teststorymaker
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.teststorymaker.databinding.ActivityMainBinding
 import com.example.teststorymaker.databinding.ActivityMyStoriesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MyStories : AppCompatActivity() {
     lateinit var binding: ActivityMyStoriesBinding
-    var data: ArrayList<dataMyStories> = ArrayList()
+    var data: ArrayList<MyStoryData> = ArrayList()
     private lateinit var topNavFragment: TopNavFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,12 +35,14 @@ class MyStories : AppCompatActivity() {
             .replace(R.id.main_nav,topNavFragment)
             .commit()
 //        testData
-        data.add(dataMyStories("text1",1))
-        data.add(dataMyStories("text2",2))
-        data.add(dataMyStories("text3",3))
-        data.add(dataMyStories("text4",4))
-        data.add(dataMyStories("text5",3))
-        data.add(dataMyStories("text6",4))
+        CoroutineScope(Dispatchers.IO).launch{
+            val db=MyRoomDB.getInstance(this@MyStories)
+            val list=db!!.MyStoryDAO().getAll()
+            for(now in list) {
+                data.add(MyStoryData(now.text, now.storyID))
+            }
+        }
+
 
     }
 }

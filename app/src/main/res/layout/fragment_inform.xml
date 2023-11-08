@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".InformFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="6"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/inform_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginVertical="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/infrom_text"
+            android:hint="주인공이 될 아이의 이름을 알려주세요"
+            android:padding="10dp"></EditText>
+
+        <EditText
+            android:id="@+id/inform_sex"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginVertical="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/infrom_text"
+            android:hint="주인공의 성별은 어떻게 되나요"
+            android:padding="10dp"></EditText>
+
+        <EditText
+            android:id="@+id/inform_age"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginVertical="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/infrom_text"
+            android:hint="주인공의 나이가 어떻게 되나요?"
+            android:padding="10dp"></EditText>
+
+        <EditText
+            android:id="@+id/inform_personality"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginVertical="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/infrom_text"
+            android:hint="주인공의 성격이나 특징을 알려주세요"
+            android:padding="10dp"></EditText>
+
+        <EditText
+            android:id="@+id/inform_name2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginVertical="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/infrom_text"
+            android:hint="다른 등장인물의 이름을 입력해주세요"
+            android:padding="10dp"></EditText>
+
+        <EditText
+            android:id="@+id/inform_subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginVertical="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/infrom_text"
+            android:hint="이 이야기의 주제는 무엇인가요"
+            android:padding="10dp"></EditText>
+
+
+    </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="#6C5CE7"
+        android:id="@+id/inform_submit_btn"
+        android:text="이야기 생성">
+
+    </Button>
+</LinearLayout>
