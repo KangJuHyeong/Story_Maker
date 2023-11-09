@@ -11,6 +11,9 @@ interface ApiService {
     @GET("your_endpoint_here")
     suspend fun getStoryData(@Query("story_id") storyId: String): Call<StoryResponse>
 
-    @POST("api/endpoint")
+    @POST("prompts/getPrompt")
     suspend fun sendData(@Body data: SubmitInform): Response<InformResponse>
+
+
+
 }

@@ -40,22 +40,15 @@ class InformFragment : Fragment() {
 
             }
 //            baseurl 채우면 밑에 주석 치우기
-//            model.sendInform(data)
-            model.response1.observe(this, Observer {
-                if(it.isSuccessful){
-                    Log.d("Response",it.body()?.result.toString())
+            model.sendInform(data)
 
-                }else{
-                    Log.d("Response",it.errorBody().toString())
-                }
-            })
-            MainActivity.preferences.setString("status","1")
-            requireActivity().supportFragmentManager.beginTransaction()
-            val fragment=requireActivity().supportFragmentManager.beginTransaction()
-            fragment.addToBackStack(null)
-            val waitingFragment=WaitingFragment()
-            fragment.replace(R.id.StoryInformFrameLayout,waitingFragment)
-            fragment.commit()
+//            MainActivity.preferences.setString("status","1")
+//            requireActivity().supportFragmentManager.beginTransaction()
+//            val fragment=requireActivity().supportFragmentManager.beginTransaction()
+//            fragment.addToBackStack(null)
+//            val waitingFragment=WaitingFragment()
+//            fragment.replace(R.id.StoryInformFrameLayout,waitingFragment)
+//            fragment.commit()
         }
     }
     override fun onDestroyView(){
