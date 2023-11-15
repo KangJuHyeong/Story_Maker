@@ -30,12 +30,12 @@ class InformFragment : Fragment() {
             //서버에 전송
             lateinit var data: SubmitInform
             binding?.apply{
-                val name =informName.toString()
-                val sex=informSex.toString()
-                val age=informAge.toString()
-                val personality= informPersonality.toString()
-                val name2= informName2.toString()
-                val subject = informSubject.toString()
+                val name =informName.text.toString()
+                val sex=informSex.text.toString()
+                val age=informAge.text.toString()
+                val personality= informPersonality.text.toString()
+                val name2= informName2.text.toString()
+                val subject = informSubject.text.toString()
                 data = SubmitInform(name, sex,age, personality, name2 , subject )
 
             }

@@ -5,15 +5,28 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.example.teststorymaker.RetrofitClient.apiService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.http.Query
+import java.io.File
+import java.io.FileOutputStream
+import java.io.FileWriter
+import java.io.IOException
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     private val TAG = "FirebaseService"
@@ -24,9 +37,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             Log.i("타이틀: ", remoteMessage.data["title"].toString())
             sendNotification(remoteMessage)
             MainActivity.preferences.setString("status","0")
+
+            val storyId = remoteMessage.data["story_id"].toString()
+
             //추가할 데이터
             val db=MyRoomDB.getInstance(this)
-            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
+            db!!.MyStoryDAO().insertStory(MyStoryData("text1", 1))
         }
         else {
             Log.i("수신에러: ", "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
@@ -34,11 +50,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             MainActivity.preferences.setString("status","0")
 
 //            테스트용
-//            val db=MyRoomDB.getInstance(
-//            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
+            val db=MyRoomDB.getInstance(context = applicationContext)
+            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
         }
     }
-
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "new Token: $token")
