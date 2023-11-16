@@ -9,5 +9,6 @@ data class MyStoryData(
     var text: String,
 //    var imageArray: ArrayList<Image>,
     @PrimaryKey
-    var storyID: Int) {
+    var storyID: Int,
+    var imgURL: String) {
 }

@@ -14,6 +14,10 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.File
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     private val TAG = "FirebaseService"
@@ -25,17 +29,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             sendNotification(remoteMessage)
             MainActivity.preferences.setString("status","0")
             //추가할 데이터
-            val db=MyRoomDB.getInstance(this)
-            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
+
         }
         else {
             Log.i("수신에러: ", "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
             Log.i("data값: ", remoteMessage.data.toString())
             MainActivity.preferences.setString("status","0")
 
-//            테스트용
-//            val db=MyRoomDB.getInstance(
-//            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
         }
     }
 
@@ -56,6 +56,34 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun sendRegistrationToServer(token: String?) {
         Log.d("TAG", "sendRegistrationTokenToServer($token)")
         //서버로 토큰 전송하기
+        CoroutineScope(Dispatchers.IO).launch {
+            val call = RetrofitClient.apiService.sendToken(token!!)
+            call.enqueue(object : Callback<TokenResponse> {
+                override fun onResponse(
+                    call: Call<TokenResponse>,
+                    response: Response<TokenResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val tokenResponse: TokenResponse? = response.body()
+                        try {
+                            Log.d("tokenResponse",tokenResponse.toString())
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        // 서버 응답이 실패한 경우
+                        val errorBody = response.errorBody()?.string()
+                        // 에러 메시지 등을 처리
+                    }
+                }
+
+                override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+                    // 네트워크 호출이 실패한 경우
+                    t.printStackTrace()
+                }
+            })
+        }
     }
     private fun sendNotification(remoteMessage: RemoteMessage) {
         // RequestCode, Id를 고유값으로 지정하여 알림이 개별 표시되도록 함
