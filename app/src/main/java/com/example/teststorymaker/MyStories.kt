@@ -34,9 +34,10 @@ class MyStories : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_nav,topNavFragment)
             .commit()
+
 //        testData
         CoroutineScope(Dispatchers.IO).launch{
-            val db=MyRoomDB.getInstance(this@MyStories)
+            val db=MyRoomDB.getInstance(applicationContext)
             val list=db!!.MyStoryDAO().getAll()
             for(now in list) {
                 data.add(MyStoryData(now.text, now.storyID))
