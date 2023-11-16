@@ -101,11 +101,11 @@ class MyStories : AppCompatActivity() {
 
     }
 
-//    fun initData() {
-//        topNavFragment= TopNavFragment()
-//        supportFragmentManager.beginTransaction()
-//            .replace(R.id.main_nav,topNavFragment)
-//            .commit()
+    fun initData() {
+        topNavFragment= TopNavFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_nav,topNavFragment)
+            .commit()
 //        CoroutineScope(Dispatchers.IO).launch {
 //            val call = RetrofitClient.apiService.getStories()
 //            call.enqueue(object : Callback<AllStoryDataResponse> {
