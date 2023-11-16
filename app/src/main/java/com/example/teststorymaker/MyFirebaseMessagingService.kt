@@ -9,10 +9,11 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.room.Room
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     private val TAG = "FirebaseService"
@@ -23,26 +24,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             Log.i("타이틀: ", remoteMessage.data["title"].toString())
             sendNotification(remoteMessage)
             MainActivity.preferences.setString("status","0")
-
             //추가할 데이터
-            CoroutineScope(Dispatchers.IO).launch {
-                //추가할 데이터
-                val db=MyRoomDB.getInstance(applicationContext)
-                db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
-            }
+            val db=MyRoomDB.getInstance(this)
+            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
         }
         else {
             Log.i("수신에러: ", "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
             Log.i("data값: ", remoteMessage.data.toString())
             MainActivity.preferences.setString("status","0")
-            sendNotification(remoteMessage)
 
-            CoroutineScope(Dispatchers.IO).launch {
-                //추가할 데이터
-
-                val db=MyRoomDB.getInstance(applicationContext)
-                db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
-            }
+//            테스트용
+//            val db=MyRoomDB.getInstance(
+//            db!!.MyStoryDAO().insertStory(MyStoryData("text1",1))
         }
     }
 

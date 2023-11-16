@@ -7,8 +7,18 @@ import com.example.teststorymaker.databinding.RowBinding
 
 class MyStoriesAdapter (val items:ArrayList<MyStoryData>)
     : RecyclerView.Adapter<MyStoriesAdapter.ViewHolder>(){
+    interface OnItemClickListener{
+        fun OnItemClick(data: MyStoryData, position:Int)
+    }
+    var itemClickListener:OnItemClickListener?=null
     inner class ViewHolder(val binding: RowBinding)
-        : RecyclerView.ViewHolder(binding.root)
+        : RecyclerView.ViewHolder(binding.root){
+        init{
+            binding.recyclerImageView.setOnClickListener{
+                itemClickListener?.OnItemClick(items[adapterPosition],adapterPosition)
+            }
+        }
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = RowBinding.inflate(
