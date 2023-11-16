@@ -50,7 +50,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         editor.commit()
 
         Log.i("로그: ", "성공적으로 토큰을 저장함")
-        sendRegistrationToServer(token)
+//        sendRegistrationToServer(token)
     }
 
     private fun sendRegistrationToServer(token: String?) {

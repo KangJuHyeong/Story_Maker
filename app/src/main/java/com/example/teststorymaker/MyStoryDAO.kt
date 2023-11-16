@@ -16,4 +16,8 @@ interface MyStoryDAO {
     // 삭제
     @Delete
     fun deleteStory(story: MyStoryData)
+
+    // 전체 데이터 삭제
+    @Query("DELETE FROM story_data")
+    fun deleteAll()
 }

@@ -101,11 +101,11 @@ class MyStories : AppCompatActivity() {
 
     }
 
-    fun initData() {
-        topNavFragment= TopNavFragment()
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.main_nav,topNavFragment)
-            .commit()
+//    fun initData() {
+//        topNavFragment= TopNavFragment()
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.main_nav,topNavFragment)
+//            .commit()
 //        CoroutineScope(Dispatchers.IO).launch {
 //            val call = RetrofitClient.apiService.getStories()
 //            call.enqueue(object : Callback<AllStoryDataResponse> {
@@ -120,7 +120,7 @@ class MyStories : AppCompatActivity() {
 //
 //                            val db=MyRoomDB.getInstance(applicationContext)
 //
-//
+//                            db!!.MyStoryDAO().deleteAll()
 //                            if (textList != null && imageList != null && storyIdList != null) {
 //                                // textList, imageList, storyIdList의 크기가 같다고 가정
 //                                for (index in textList.indices) {
@@ -153,6 +153,7 @@ class MyStories : AppCompatActivity() {
             val db=MyRoomDB.getInstance(applicationContext)
             db?.MyStoryDAO()?.insertStory(MyStoryData("afsd", 1,"https://www.eastflag.co.kr/wp-content/uploads/2021/03/webpack_image_uri.png"))
             val list=db!!.MyStoryDAO().getAll()
+
             for(now in list) {
                 data.add(MyStoryData(now.text, now.storyID,now.imgURL))
             }
