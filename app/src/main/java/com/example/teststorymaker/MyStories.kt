@@ -51,6 +51,7 @@ class MyStories : AppCompatActivity() {
                             response: Response<StoryResponse>
                         ) {
                             if (response.isSuccessful) {
+                                Log.e("result","success")
                                 val storyResponse: StoryResponse? = response.body()
                                 try {
                                     // Retrofit을 사용하여 리스트를 받아옴
@@ -85,6 +86,7 @@ class MyStories : AppCompatActivity() {
                                 // 서버 응답이 실패한 경우
                                 val errorBody = response.errorBody()?.string()
                                 // 에러 메시지 등을 처리
+                                Log.e("result","fail")
                             }
                         }
 
@@ -162,7 +164,7 @@ class MyStories : AppCompatActivity() {
 
     }
     private fun saveTextToFile(text: String, index: Int, storyId: Int) {
-        val file = File(applicationContext.filesDir, "story_text.txt")
+        val file = File(applicationContext.filesDir, "${storyId}story_text${index}.txt")
 
         try {
             // 파일에 데이터 쓰기
