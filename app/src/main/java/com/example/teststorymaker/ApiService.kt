@@ -6,10 +6,10 @@ import retrofit2.http.*
 
 interface ApiService {
     @GET("your_endpoint_here")
-    suspend fun getStoryData(@Query("story_id") storyId: String): Call<StoryResponse>
+    fun getStoryData(@Query("story_id") storyId: String): Call<List<StoryResponse>>
 
-    @GET("prompts/getStories")
-    suspend fun getStories(): Call<AllStoryDataResponse>
+    @GET("prompts/getList")
+    fun getStories(): Call<List<AllStoryDataResponse>>
 
 
     @FormUrlEncoded

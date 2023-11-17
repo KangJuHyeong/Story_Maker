@@ -28,73 +28,65 @@ class MyStories : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding= ActivityMyStoriesBinding.inflate(layoutInflater)
+        binding = ActivityMyStoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initData()
         initRecyclerView()
     }
-    fun initRecyclerView(){
+
+    fun initRecyclerView() {
 //        binding.myStoriesRecyclerView.layoutManager= LinearLayoutManager(this,
 //            LinearLayoutManager.VERTICAL,false)
-        binding.myStoriesRecyclerView.layoutManager= GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
+        binding.myStoriesRecyclerView.layoutManager =
+            GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
         val adapter = MyStoriesAdapter(data)
-        binding.myStoriesRecyclerView.adapter=adapter
-        adapter.itemClickListener = object :MyStoriesAdapter.OnItemClickListener{
+        binding.myStoriesRecyclerView.adapter = adapter
+        adapter.itemClickListener = object : MyStoriesAdapter.OnItemClickListener {
             override fun OnItemClick(data: MyStoryData, position: Int) {
-                val intent = Intent(this@MyStories, StoryProgress::class.java)
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    val call = RetrofitClient.apiService.getStoryData(data.storyID.toString())
-                    call.enqueue(object : Callback<StoryResponse> {
-                        override fun onResponse(
-                            call: Call<StoryResponse>,
-                            response: Response<StoryResponse>
-                        ) {
-                            if (response.isSuccessful) {
-                                val storyResponse: StoryResponse? = response.body()
-                                try {
-                                    // Retrofit을 사용하여 리스트를 받아옴
-                                    val textList = storyResponse?.texts
-                                    val imageList = storyResponse?.images
-
-                                    val file = File(
-                                        applicationContext.filesDir,
-                                        "${data.storyID}story_text0.txt"
-                                    )
-                                    if (!file.exists()) {
-                                        // 이미지를 내부 저장소에 저장
-                                        if (textList != null && imageList != null) {
-                                            for ((index, text) in textList.withIndex()) {
-                                                saveTextToFile(text, index, data.storyID)
-                                            }
-                                            for ((index, imageUrl) in imageList.withIndex()) {
-                                                downloadAndSaveImage(imageUrl, index, data.storyID)
-                                            }
-                                        }
-                                    } else {
-                                        if (textList != null) {
-                                            intent.putExtra("pageSize", textList.size)
-                                            intent.putExtra("storyId", data.storyID)
-                                        }
+                val call = RetrofitClient.apiService.getStoryData(data.storyID.toString())
+                call.enqueue(object : Callback<List<StoryResponse>> {
+                    override fun onResponse(
+                        call: Call<List<StoryResponse>>,
+                        response: Response<List<StoryResponse>>
+                    ) {
+                        if (response.isSuccessful) {
+                            val storyResponse: List<StoryResponse>? = response.body()
+                            try {
+                                val intent = Intent(this@MyStories, StoryProgress::class.java)
+                                val file = File(
+                                    applicationContext.filesDir,
+                                    "${data.storyID}story_text0.txt"
+                                )
+                                if (!file.exists()) {
+                                    // 이미지를 내부 저장소에 저장
+                                    for((index,now) in storyResponse!!.withIndex()){
+                                        saveTextToFile(now.text, index, data.storyID)
+                                        downloadAndSaveImage(now.image, index, data.storyID)
                                     }
-
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
+                                } else {
+                                    if (storyResponse != null) {
+                                        intent.putExtra("pageSize", storyResponse.size)
+                                        intent.putExtra("storyId", data.storyID)
+                                    }
                                 }
-                            } else {
-                                // 서버 응답이 실패한 경우
-                                val errorBody = response.errorBody()?.string()
-                                // 에러 메시지 등을 처리
-                            }
-                        }
+                                startActivity(intent)
 
-                        override fun onFailure(call: Call<StoryResponse>, t: Throwable) {
-                            // 네트워크 호출이 실패한 경우
-                            t.printStackTrace()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        } else {
+                            // 서버 응답이 실패한 경우
+                            val errorBody = response.errorBody()?.string()
+                            // 에러 메시지 등을 처리
                         }
-                    })
-                }
-                startActivity(intent)
+                    }
+
+                    override fun onFailure(call: Call<List<StoryResponse>>, t: Throwable) {
+                        // 네트워크 호출이 실패한 경우
+                        t.printStackTrace()
+                    }
+                })
+
             }
 
         }
@@ -102,65 +94,57 @@ class MyStories : AppCompatActivity() {
     }
 
     fun initData() {
-        topNavFragment= TopNavFragment()
+        topNavFragment = TopNavFragment()
         supportFragmentManager.beginTransaction()
-            .replace(R.id.main_nav,topNavFragment)
+            .replace(R.id.main_nav, topNavFragment)
             .commit()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val call = RetrofitClient.apiService.getStories()
-//            call.enqueue(object : Callback<AllStoryDataResponse> {
-//                override fun onResponse(call: Call<AllStoryDataResponse>, response: Response<AllStoryDataResponse>) {
-//                    if (response.isSuccessful) {
-//                        val storyResponse: AllStoryDataResponse? = response.body()
-//                        try {
-//                            // Retrofit을 사용하여 리스트를 받아옴
-//                            val textList = storyResponse?.texts
-//                            val imageList = storyResponse?.images
-//                            val storyIdList=storyResponse?.story_ids
-//
-//                            val db=MyRoomDB.getInstance(applicationContext)
-//
-//                            db!!.MyStoryDAO().deleteAll()
-//                            if (textList != null && imageList != null && storyIdList != null) {
-//                                // textList, imageList, storyIdList의 크기가 같다고 가정
-//                                for (index in textList.indices) {
-//                                    val text = textList[index]
-//                                    val image = imageList[index]
-//                                    val storyId = storyIdList[index]
-//
-//                                    db?.MyStoryDAO()?.insertStory(MyStoryData(text, storyId.toInt(),image))
-//                                }
-//                            }
-//
-//
-//                        } catch (e: Exception) {
-//                            e.printStackTrace()
-//                        }
-//                    } else {
-//                        // 서버 응답이 실패한 경우
-//                        val errorBody = response.errorBody()?.string()
-//                        // 에러 메시지 등을 처리
-//                    }
-//                }
-//                override fun onFailure(call: Call<AllStoryDataResponse>, t: Throwable) {
-//                    // 네트워크 호출이 실패한 경우
-//                    t.printStackTrace()
-//                }
-//            })
-//        }
+        val call = RetrofitClient.apiService.getStories()
+        call.enqueue(object : Callback<List<AllStoryDataResponse>> {
+            override fun onResponse(
+                call: Call<List<AllStoryDataResponse>>,
+                response: Response<List<AllStoryDataResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    val storyResponse: List<AllStoryDataResponse>? = response.body()
+                    try {
+                        val db = MyRoomDB.getInstance(applicationContext)
+                        db!!.MyStoryDAO().deleteAll()
+                        if (storyResponse != null) {
+                            for (now in storyResponse) {
+                                val text = now.title
+                                val image = now.content
+                                val storyId = now.id
 
-        CoroutineScope(Dispatchers.IO).launch{
-            val db=MyRoomDB.getInstance(applicationContext)
-            db?.MyStoryDAO()?.insertStory(MyStoryData("afsd", 1,"https://www.eastflag.co.kr/wp-content/uploads/2021/03/webpack_image_uri.png"))
-            val list=db!!.MyStoryDAO().getAll()
+                                db?.MyStoryDAO()
+                                    ?.insertStory(MyStoryData(text, storyId.toInt(), image))
 
-            for(now in list) {
-                data.add(MyStoryData(now.text, now.storyID,now.imgURL))
+                            }
+                        }
+                        val list = db!!.MyStoryDAO().getAll()
+
+                        for (now in list) {
+                            data.add(MyStoryData(now.text, now.storyID, now.imgURL))
+                        }
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                } else {
+                    // 서버 응답이 실패한 경우
+                    val errorBody = response.errorBody()?.string()
+                    // 에러 메시지 등을 처리
+                }
             }
-        }
 
+            override fun onFailure(call: Call<List<AllStoryDataResponse>>, t: Throwable) {
+                // 네트워크 호출이 실패한 경우
+                Log.d("서버","안열림")
+                t.printStackTrace()
+            }
+        })
 
     }
+
     private fun saveTextToFile(text: String, index: Int, storyId: Int) {
         val file = File(applicationContext.filesDir, "story_text.txt")
 
@@ -174,6 +158,7 @@ class MyStories : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
     private fun downloadAndSaveImage(imageUrl: String, index: Int, storyId: Int) {
         try {
             // Glide나 Picasso 등을 사용하여 이미지 다운로드

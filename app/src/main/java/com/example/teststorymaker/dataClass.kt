@@ -4,14 +4,18 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class StoryResponse(
-    val images: List<String>,
-    val texts: List<String>
+    val image: String,
+    val text: String
 )
 
 data class AllStoryDataResponse(
-    val images: List<String>,
-    val texts: List<String>,
-    val story_ids: List<String>
+    val _id: String,
+    val id: String,
+    val title: String,
+    //img URL
+    val content: String,
+    val __v: String
+
 )
 
 data class SubmitInform(
