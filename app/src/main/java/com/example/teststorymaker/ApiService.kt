@@ -5,8 +5,8 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
-    @GET("your_endpoint_here")
-    fun getStoryData(@Query("story_id") storyId: String): Call<List<StoryResponse>>
+    @GET("prompts/getStory")
+    fun getStoryData(@Query("_id") storyId: String): Call<List<StoryResponse>>
 
     @GET("prompts/getList")
     fun getStories(): Call<List<AllStoryDataResponse>>
@@ -18,6 +18,6 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST("your_token_endpoint_here")
-    suspend fun sendToken(@Field("token") token: String): Call<TokenResponse>
+    fun sendToken(@Field("token") token: String): Call<TokenResponse>
 
 }

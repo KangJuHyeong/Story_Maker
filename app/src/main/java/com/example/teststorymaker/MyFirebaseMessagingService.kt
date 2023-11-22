@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
@@ -23,18 +24,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private val TAG = "FirebaseService"
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d(TAG, "From: " + remoteMessage!!.from)
-        if(remoteMessage.data.isNotEmpty()){
+        if (remoteMessage.data.isNotEmpty()) {
             Log.i("바디: ", remoteMessage.data["body"].toString())
             Log.i("타이틀: ", remoteMessage.data["title"].toString())
             sendNotification(remoteMessage)
-            MainActivity.preferences.setString("status","0")
+            MainActivity.preferences.setString("status", "0")
             //추가할 데이터
 
-        }
-        else {
+        } else {
             Log.i("수신에러: ", "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
             Log.i("data값: ", remoteMessage.data.toString())
-            MainActivity.preferences.setString("status","0")
+            MainActivity.preferences.setString("status", "0")
 
         }
     }
@@ -50,41 +50,41 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         editor.commit()
 
         Log.i("로그: ", "성공적으로 토큰을 저장함")
-//        sendRegistrationToServer(token)
+        sendRegistrationToServer(token)
     }
 
     private fun sendRegistrationToServer(token: String?) {
         Log.d("TAG", "sendRegistrationTokenToServer($token)")
         //서버로 토큰 전송하기
-        CoroutineScope(Dispatchers.IO).launch {
-            val call = RetrofitClient.apiService.sendToken(token!!)
-            call.enqueue(object : Callback<TokenResponse> {
-                override fun onResponse(
-                    call: Call<TokenResponse>,
-                    response: Response<TokenResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val tokenResponse: TokenResponse? = response.body()
-                        try {
-                            Log.d("tokenResponse",tokenResponse.toString())
+        val call = RetrofitClient.apiService.sendToken(token!!)
+        call.enqueue(object : Callback<TokenResponse> {
+            override fun onResponse(
+                call: Call<TokenResponse>,
+                response: Response<TokenResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val tokenResponse: TokenResponse? = response.body()
+                    try {
+                        Log.d("tokenResponse", tokenResponse.toString())
 
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    } else {
-                        // 서버 응답이 실패한 경우
-                        val errorBody = response.errorBody()?.string()
-                        // 에러 메시지 등을 처리
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
+                } else {
+                    // 서버 응답이 실패한 경우
+                    val errorBody = response.errorBody()?.string()
+                    // 에러 메시지 등을 처리
                 }
+            }
 
-                override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
-                    // 네트워크 호출이 실패한 경우
-                    t.printStackTrace()
-                }
-            })
-        }
+            override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+                // 네트워크 호출이 실패한 경우
+                t.printStackTrace()
+            }
+        })
+
     }
+
     private fun sendNotification(remoteMessage: RemoteMessage) {
         // RequestCode, Id를 고유값으로 지정하여 알림이 개별 표시되도록 함
         val uniId: Int = (System.currentTimeMillis() / 7).toInt()
@@ -93,7 +93,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // PendingIntent : Intent 의 실행 권한을 외부의 어플리케이션에게 위임한다.
         val intent = Intent(this, MyStories::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // Activity Stack 을 경로만 남긴다. A-B-C-D-B => A-B
-        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            uniId,
+            intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         // 알림 채널 이름
         val channelId = getString(R.string.firebase_notification_channel_id)
@@ -115,7 +120,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         // 오레오 버전 이후에는 채널이 필요하다.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Notice", NotificationManager.IMPORTANCE_DEFAULT)
+            val channel =
+                NotificationChannel(channelId, "Notice", NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
 

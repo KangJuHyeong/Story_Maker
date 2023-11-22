@@ -4,8 +4,10 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class StoryResponse(
-    val image: String,
-    val text: String
+    @SerializedName("title")
+    val text: String,
+    @SerializedName("content")
+    val image: String
 )
 
 data class AllStoryDataResponse(

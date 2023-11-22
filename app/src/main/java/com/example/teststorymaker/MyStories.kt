@@ -25,7 +25,7 @@ class MyStories : AppCompatActivity() {
     lateinit var binding: ActivityMyStoriesBinding
     var data: ArrayList<MyStoryData> = ArrayList()
     private lateinit var topNavFragment: TopNavFragment
-
+    private lateinit var adapter: MyStoriesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyStoriesBinding.inflate(layoutInflater)
@@ -39,7 +39,7 @@ class MyStories : AppCompatActivity() {
 //            LinearLayoutManager.VERTICAL,false)
         binding.myStoriesRecyclerView.layoutManager =
             GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
-        val adapter = MyStoriesAdapter(data)
+        adapter = MyStoriesAdapter(data)
         binding.myStoriesRecyclerView.adapter = adapter
         adapter.itemClickListener = object : MyStoriesAdapter.OnItemClickListener {
             override fun OnItemClick(data: MyStoryData, position: Int) {
@@ -52,6 +52,9 @@ class MyStories : AppCompatActivity() {
                         if (response.isSuccessful) {
                             val storyResponse: List<StoryResponse>? = response.body()
                             try {
+                                for (now in storyResponse!!) {
+                                    Log.d(now.image, now.text)
+                                }
                                 val intent = Intent(this@MyStories, StoryProgress::class.java)
                                 val file = File(
                                     applicationContext.filesDir,
@@ -59,7 +62,7 @@ class MyStories : AppCompatActivity() {
                                 )
                                 if (!file.exists()) {
                                     // 이미지를 내부 저장소에 저장
-                                    for((index,now) in storyResponse!!.withIndex()){
+                                    for ((index, now) in storyResponse!!.withIndex()) {
                                         saveTextToFile(now.text, index, data.storyID)
                                         downloadAndSaveImage(now.image, index, data.storyID)
                                     }
@@ -77,12 +80,14 @@ class MyStories : AppCompatActivity() {
                         } else {
                             // 서버 응답이 실패한 경우
                             val errorBody = response.errorBody()?.string()
+                            Log.d("call err",errorBody!!)
                             // 에러 메시지 등을 처리
                         }
                     }
 
                     override fun onFailure(call: Call<List<StoryResponse>>, t: Throwable) {
                         // 네트워크 호출이 실패한 경우
+                        Log.d("network err","network err")
                         t.printStackTrace()
                     }
                 })
@@ -98,6 +103,8 @@ class MyStories : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_nav, topNavFragment)
             .commit()
+
+
         val call = RetrofitClient.apiService.getStories()
         call.enqueue(object : Callback<List<AllStoryDataResponse>> {
             override fun onResponse(
@@ -107,45 +114,57 @@ class MyStories : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val storyResponse: List<AllStoryDataResponse>? = response.body()
                     try {
-                        val db = MyRoomDB.getInstance(applicationContext)
-                        db!!.MyStoryDAO().deleteAll()
                         if (storyResponse != null) {
+
                             for (now in storyResponse) {
+
                                 val text = now.title
                                 val image = now.content
-                                val storyId = now.id
-
-                                db?.MyStoryDAO()
-                                    ?.insertStory(MyStoryData(text, storyId.toInt(), image))
-
+                                val storyId = now._id
+                                Log.d(text,image)
+                                Log.d(storyId,"[")
+                                data.add(MyStoryData(text, storyId, image))
                             }
                         }
-                        val list = db!!.MyStoryDAO().getAll()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val db = MyRoomDB.getInstance(applicationContext)
+                            db!!.MyStoryDAO().deleteAll()
 
-                        for (now in list) {
-                            data.add(MyStoryData(now.text, now.storyID, now.imgURL))
+                            for (now in data) {
+
+                                val text = now.text
+                                val image = now.imgURL
+                                val storyId = now.storyID
+                                Log.d(text, image)
+                                db?.MyStoryDAO()
+                                    ?.insertStory(MyStoryData(text, storyId, image))
+                            }
                         }
-
+                        adapter!!.notifyDataSetChanged()
                     } catch (e: Exception) {
+                        Log.d("some err","err")
                         e.printStackTrace()
                     }
                 } else {
                     // 서버 응답이 실패한 경우
                     val errorBody = response.errorBody()?.string()
+                    if (errorBody != null) {
+                        Log.d("some err",errorBody)
+                    }
                     // 에러 메시지 등을 처리
                 }
             }
 
             override fun onFailure(call: Call<List<AllStoryDataResponse>>, t: Throwable) {
                 // 네트워크 호출이 실패한 경우
-                Log.d("서버","안열림")
+                Log.d("서버", "안열림")
                 t.printStackTrace()
             }
         })
 
     }
 
-    private fun saveTextToFile(text: String, index: Int, storyId: Int) {
+    private fun saveTextToFile(text: String, index: Int, storyId: String) {
         val file = File(applicationContext.filesDir, "story_text.txt")
 
         try {
@@ -159,7 +178,7 @@ class MyStories : AppCompatActivity() {
         }
     }
 
-    private fun downloadAndSaveImage(imageUrl: String, index: Int, storyId: Int) {
+    private fun downloadAndSaveImage(imageUrl: String, index: Int, storyId: String) {
         try {
             // Glide나 Picasso 등을 사용하여 이미지 다운로드
             val bitmap = Glide.with(applicationContext)
@@ -175,7 +194,7 @@ class MyStories : AppCompatActivity() {
         }
     }
 
-    private fun saveImageToFile(bitmap: Bitmap, index: Int, storyId: Int) {
+    private fun saveImageToFile(bitmap: Bitmap, index: Int, storyId: String) {
         val fileName = "${storyId}story_image${index}.jpg"
         val file = File(applicationContext.filesDir, fileName)
 
