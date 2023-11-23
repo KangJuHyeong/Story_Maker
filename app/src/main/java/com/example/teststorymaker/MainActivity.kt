@@ -16,6 +16,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "FirebaseService"
@@ -45,6 +48,38 @@ class MainActivity : AppCompatActivity() {
 //            val msg = getString(R.string.msg_token_fmt.toInt(), token)
             Log.d(TAG, token)
             Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+
+
+//            val call = RetrofitClient.apiService.sendToken(token!!)
+//            call.enqueue(object : Callback<TokenResponse> {
+//                override fun onResponse(
+//                    call: Call<TokenResponse>,
+//                    response: Response<TokenResponse>
+//                ) {
+//                    if (response.isSuccessful) {
+//                        val tokenResponse: TokenResponse? = response.body()
+//                        try {
+//                            Log.d("tokenResponse", tokenResponse!!.result)
+//
+//                        } catch (e: Exception) {
+//                            e.printStackTrace()
+//                        }
+//                    } else {
+//                        // 서버 응답이 실패한 경우
+//                        val errorBody = response.errorBody()?.string()
+//                        // 에러 메시지 등을 처리
+//                        Log.d("응답실패",errorBody.toString())
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+//                    // 네트워크 호출이 실패한 경우
+//                    Log.d("연결실패","연결실패")
+//                    t.printStackTrace()
+//                }
+//            })
+
+
         })
 
 
@@ -65,6 +100,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         askNotificationPermission()
+
+
+
+
     }
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),

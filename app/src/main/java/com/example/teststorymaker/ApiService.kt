@@ -19,7 +19,7 @@ interface ApiService {
     suspend fun sendData2(@FieldMap params: Map<String, String>): Response<InformResponse>
 
     @FormUrlEncoded
-    @POST("your_token_endpoint_here")
+    @POST("prompts/save-token")
     fun sendToken(@Field("token") token: String): Call<TokenResponse>
 
 }

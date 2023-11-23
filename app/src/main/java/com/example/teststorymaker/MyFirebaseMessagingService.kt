@@ -50,7 +50,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         editor.commit()
 
         Log.i("로그: ", "성공적으로 토큰을 저장함")
-//        sendRegistrationToServer(token)
+        sendRegistrationToServer(token)
     }
 
     private fun sendRegistrationToServer(token: String?) {
@@ -74,11 +74,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     // 서버 응답이 실패한 경우
                     val errorBody = response.errorBody()?.string()
                     // 에러 메시지 등을 처리
+                    Log.d("응답실패",errorBody.toString())
                 }
             }
 
             override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
                 // 네트워크 호출이 실패한 경우
+                Log.d("연결실패","연결실패")
                 t.printStackTrace()
             }
         })
