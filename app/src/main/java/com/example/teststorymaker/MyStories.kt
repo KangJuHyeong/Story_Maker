@@ -44,35 +44,37 @@ class MyStories : AppCompatActivity() {
         adapter.itemClickListener = object : MyStoriesAdapter.OnItemClickListener {
             override fun OnItemClick(data: MyStoryData, position: Int) {
                 val call = RetrofitClient.apiService.getStoryData(data.storyID.toString())
-                call.enqueue(object : Callback<List<StoryResponse>> {
+                call.enqueue(object : Callback<StoryResponse> {
                     override fun onResponse(
-                        call: Call<List<StoryResponse>>,
-                        response: Response<List<StoryResponse>>
+                        call: Call<StoryResponse>,
+                        response: Response<StoryResponse>
                     ) {
                         if (response.isSuccessful) {
-                            val storyResponse: List<StoryResponse>? = response.body()
+                            val storyResponse: StoryResponse? = response.body()
                             try {
-                                for (now in storyResponse!!) {
-                                    Log.d(now.image, now.text)
+                                Log.d(storyResponse!!.title.toString(),storyResponse!!._id.toString())
+
+                                for (now in storyResponse!!.contents) {
+                                    Log.d(now.image,now.detail)
                                 }
-                                val intent = Intent(this@MyStories, StoryProgress::class.java)
-                                val file = File(
-                                    applicationContext.filesDir,
-                                    "${data.storyID}story_text0.txt"
-                                )
-                                if (!file.exists()) {
-                                    // 이미지를 내부 저장소에 저장
-                                    for ((index, now) in storyResponse!!.withIndex()) {
-                                        saveTextToFile(now.text, index, data.storyID)
-                                        downloadAndSaveImage(now.image, index, data.storyID)
-                                    }
-                                } else {
-                                    if (storyResponse != null) {
-                                        intent.putExtra("pageSize", storyResponse.size)
-                                        intent.putExtra("storyId", data.storyID)
-                                    }
-                                }
-                                startActivity(intent)
+//                                val intent = Intent(this@MyStories, StoryProgress::class.java)
+//                                val file = File(
+//                                    applicationContext.filesDir,
+//                                    "${data.storyID}story_text0.txt"
+//                                )
+//                                if (!file.exists()) {
+//                                    // 이미지를 내부 저장소에 저장
+//                                    for ((index, now) in storyResponse!!.withIndex()) {
+//                                        saveTextToFile(now.text, index, data.storyID)
+//                                        downloadAndSaveImage(now.image, index, data.storyID)
+//                                    }
+//                                } else {
+//                                    if (storyResponse != null) {
+//                                        intent.putExtra("pageSize", storyResponse.size)
+//                                        intent.putExtra("storyId", data.storyID)
+//                                    }
+//                                }
+//                                startActivity(intent)
 
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -85,7 +87,7 @@ class MyStories : AppCompatActivity() {
                         }
                     }
 
-                    override fun onFailure(call: Call<List<StoryResponse>>, t: Throwable) {
+                    override fun onFailure(call: Call<StoryResponse>, t: Throwable) {
                         // 네트워크 호출이 실패한 경우
                         Log.d("network err","network err")
                         t.printStackTrace()
@@ -103,8 +105,6 @@ class MyStories : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_nav, topNavFragment)
             .commit()
-
-
         val call = RetrofitClient.apiService.getStories()
         call.enqueue(object : Callback<List<AllStoryDataResponse>> {
             override fun onResponse(
@@ -119,8 +119,8 @@ class MyStories : AppCompatActivity() {
                             for (now in storyResponse) {
 
                                 val text = now.title
-                                val image = now.content
-                                val storyId = now._id
+                                val image = now.image
+                                val storyId = now.id
                                 Log.d(text,image)
                                 Log.d(storyId,"[")
                                 data.add(MyStoryData(text, storyId, image))

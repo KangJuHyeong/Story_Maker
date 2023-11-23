@@ -5,8 +5,10 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
-    @GET("prompts/getStory")
-    fun getStoryData(@Query("_id") storyId: String): Call<List<StoryResponse>>
+
+    @FormUrlEncoded
+    @POST("prompts/getStory")
+    fun getStoryData(@Field("id") storyId: String): Call<StoryResponse>
 
     @GET("prompts/getList")
     fun getStories(): Call<List<AllStoryDataResponse>>
