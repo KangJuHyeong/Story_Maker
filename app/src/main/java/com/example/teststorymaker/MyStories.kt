@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -54,10 +55,11 @@ class MyStories : AppCompatActivity() {
                             try {
                                 Log.d(storyResponse!!.title.toString(),storyResponse!!._id.toString())
 
-                                for (now in storyResponse!!.contents) {
-                                    Log.d(now.image,now.detail)
-                                }
-//                                val intent = Intent(this@MyStories, StoryProgress::class.java)
+//                                for (now in storyResponse!!.contents) {
+//                                    Log.d(now.image,now.detail)
+//                                }
+                                val intent = Intent(this@MyStories, StoryProgress::class.java)
+                                intent.putParcelableArrayListExtra("page", ArrayList(storyResponse!!.contents))
 //                                val file = File(
 //                                    applicationContext.filesDir,
 //                                    "${data.storyID}story_text0.txt"
@@ -74,7 +76,7 @@ class MyStories : AppCompatActivity() {
 //                                        intent.putExtra("storyId", data.storyID)
 //                                    }
 //                                }
-//                                startActivity(intent)
+                                startActivity(intent)
 
                             } catch (e: Exception) {
                                 e.printStackTrace()

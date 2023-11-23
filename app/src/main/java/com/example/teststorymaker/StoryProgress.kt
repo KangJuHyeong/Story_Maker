@@ -2,6 +2,8 @@ package com.example.teststorymaker
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Glide.init
 import com.example.teststorymaker.databinding.ActivityStoryProgressBinding
@@ -15,31 +17,67 @@ class StoryProgress : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStoryProgressBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_story_progress)
+        setContentView(binding.root)
         init()
     }
     fun init(){
-        val pageSize = intent.getIntExtra("pageSize", 0)
-        val storyId = intent.getIntExtra("storyId", -1)
-        var currentPage = 0
+//        val pageSize = intent.getIntExtra("pageSize", 0)
+//        val storyId = intent.getIntExtra("storyId", -1)
+//
+//        if(pageSize != 0){
+//            binding.storyText.text = readTextFromFile(storyId, currentPage)
+//            readImageFromFile(storyId, currentPage)
+//        }
+//        binding.previousBtn.setOnClickListener {
+//            if(currentPage > 0){
+//                currentPage--
+//                binding.storyText.text = readTextFromFile(storyId, currentPage)
+//                readImageFromFile(storyId, currentPage)
+//            }
+//        }
+//        binding.nextBtn.setOnClickListener {
+//            if(currentPage != pageSize-1){
+//                currentPage++
+//                binding.storyText.text = readTextFromFile(storyId, currentPage)
+//                readImageFromFile(storyId, currentPage)
+//            }
+//        }
 
-        if(pageSize != 0){
-            binding.storyText.text = readTextFromFile(storyId, currentPage)
-            readImageFromFile(storyId, currentPage)
-        }
-        binding.previousBtn.setOnClickListener {
-            if(currentPage > 0){
+        val pageList : ArrayList<ContentItem>? = intent.getParcelableArrayListExtra("page")
+        var currentPage = 0
+        binding.previousBtn.isEnabled = false
+        if (pageList != null) {
+            Log.d("success","intent success")
+
+            Glide.with(applicationContext)
+                .load(pageList[currentPage].image)
+                .into(binding.storyImage)
+            binding.storyText.text = pageList[currentPage].detail
+
+            binding.previousBtn.setOnClickListener {
                 currentPage--
-                binding.storyText.text = readTextFromFile(storyId, currentPage)
-                readImageFromFile(storyId, currentPage)
+                Glide.with(applicationContext)
+                    .load(pageList[currentPage].image)
+                    .into(binding.storyImage)
+                binding.storyText.text = pageList[currentPage].detail
+                if(currentPage == 0)
+                    binding.previousBtn.isEnabled = false
+                binding.nextBtn.isEnabled = true
+
+            }
+            binding.nextBtn.setOnClickListener {
+                currentPage++
+                Glide.with(applicationContext)
+                    .load(pageList[currentPage].image)
+                    .into(binding.storyImage)
+                binding.storyText.text = pageList[currentPage].detail
+                if(currentPage == pageList.size-1)
+                    binding.nextBtn.isEnabled = false
+                binding.previousBtn.isEnabled = true
             }
         }
-        binding.nextBtn.setOnClickListener {
-            if(currentPage != pageSize-1){
-                currentPage++
-                binding.storyText.text = readTextFromFile(storyId, currentPage)
-                readImageFromFile(storyId, currentPage)
-            }
+        else{
+            Log.d("fail","intent fail")
         }
     }
 
