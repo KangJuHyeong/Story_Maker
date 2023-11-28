@@ -1,19 +1,21 @@
 package com.example.teststorymaker
 
-import androidx.appcompat.app.AppCompatActivity
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
-import androidx.core.net.toUri
+import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.bumptech.glide.Glide.init
 import com.example.teststorymaker.databinding.ActivityStoryProgressBinding
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
 
+
 class StoryProgress : AppCompatActivity() {
     lateinit var binding: ActivityStoryProgressBinding
+    private var mediaPlayer: MediaPlayer? = null
+    private var mp3Url = "@raw/song1.mp3"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStoryProgressBinding.inflate(layoutInflater)
@@ -79,6 +81,30 @@ class StoryProgress : AppCompatActivity() {
         else{
             Log.d("fail","intent fail")
         }
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.song1)
+//        try {
+//                mediaPlayer?.create(R.raw.song1)
+//                mediaPlayer?.prepareAsync() // 비동기적으로 준비
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+        binding.playBtn.setOnClickListener {
+            // MP3 파일 로딩
+            if(mediaPlayer!!.isPlaying){
+                mediaPlayer!!.pause()
+            }
+            else{
+                mediaPlayer?.start()
+                // MediaPlayer 이벤트 리스너 설정
+                mediaPlayer?.setOnPreparedListener {
+                    // MediaPlayer가 준비되면 재생
+                    Log.d("play", "success")
+                }
+            }
+
+        }
+
     }
 
     private fun readTextFromFile(storyId: Int, pageNum: Int): String? {
