@@ -2,9 +2,12 @@ package com.example.teststorymaker
 
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Glide.init
@@ -13,18 +16,46 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
-class StoryProgress : AppCompatActivity() {
+class StoryProgress : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var isMusicPlaying = false
     private var mediaPlayer: MediaPlayer? = null
-
+    private lateinit var textToSpeech: TextToSpeech
     lateinit var binding: ActivityStoryProgressBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStoryProgressBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        textToSpeech = TextToSpeech(this, this)
         init()
+
     }
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            // TTS 초기화 성공
+            val result = textToSpeech.setLanguage(Locale.KOREAN)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Language is not supported.")
+            }
+        } else {
+            Log.e("TTS", "Initialization failed.")
+        }
+    }
+    private fun speakText(text: String) {
+        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+    }
+    override fun onDestroy() {
+        // 액티비티 종료 시 TTS 리소스 해제
+        if (textToSpeech.isSpeaking) {
+            textToSpeech.stop()
+        }
+        textToSpeech.shutdown()
+        super.onDestroy()
+    }
+
     fun init(){
 //        val pageSize = intent.getIntExtra("pageSize", 0)
 //        val storyId = intent.getIntExtra("storyId", -1)
@@ -72,6 +103,9 @@ class StoryProgress : AppCompatActivity() {
                     // If music is playing, stop playback
                     stopMusic()
                 }
+                if (textToSpeech.isSpeaking) {
+                    textToSpeech.stop()
+                }
 
             }
             binding.nextBtn.setOnClickListener {
@@ -87,8 +121,17 @@ class StoryProgress : AppCompatActivity() {
                     // If music is playing, stop playback
                     stopMusic()
                 }
+                if (textToSpeech.isSpeaking) {
+                    textToSpeech.stop()
+                }
             }
             binding.playBtn.setOnClickListener{
+                if (textToSpeech.isSpeaking) {
+                    textToSpeech.stop()
+                }else{
+                    textToSpeech.stop()
+                    speakText(pageList[currentPage].detail)
+                }
                 if (isMusicPlaying) {
                     // If music is playing, stop playback
                     stopMusic()
