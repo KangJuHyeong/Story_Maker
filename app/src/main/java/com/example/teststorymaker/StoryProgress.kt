@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
@@ -125,12 +126,16 @@ class StoryProgress : AppCompatActivity(), TextToSpeech.OnInitListener {
                     textToSpeech.stop()
                 }
             }
+            val params = Bundle()
+            params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "complete")
             binding.playBtn.setOnClickListener{
                 if (textToSpeech.isSpeaking) {
                     textToSpeech.stop()
+                    binding.playBtn.setBackgroundResource(R.drawable.baseline_play_circle_24)
                 }else{
+                    binding.playBtn.setBackgroundResource(R.drawable.baseline_stop_circle_24)
                     textToSpeech.stop()
-                    speakText(pageList[currentPage].detail)
+                    textToSpeech.speak(pageList[currentPage].detail, TextToSpeech.QUEUE_FLUSH, params, "complete")
                 }
                 if (isMusicPlaying) {
                     // If music is playing, stop playback
@@ -141,6 +146,18 @@ class StoryProgress : AppCompatActivity(), TextToSpeech.OnInitListener {
                 }
 
             }
+            textToSpeech.setOnUtteranceProgressListener(object : UtteranceProgressListener(){
+                override fun onStart(p0: String?) {
+                }
+                override fun onDone(p0: String?) {
+                    if(p0 == "complete"){
+                        stopMusic()
+                        binding.playBtn.setBackgroundResource(R.drawable.baseline_play_circle_24)
+                    }
+                }
+                override fun onError(p0: String?) {
+                }
+            })
         }
         else{
             Log.d("fail","intent fail")
@@ -195,7 +212,6 @@ class StoryProgress : AppCompatActivity(), TextToSpeech.OnInitListener {
             mediaPlayer?.start()
 
             isMusicPlaying = true
-            binding.playBtn.text = "중지" // 버튼 텍스트를 "중지"로 변경
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -207,6 +223,5 @@ class StoryProgress : AppCompatActivity(), TextToSpeech.OnInitListener {
         mediaPlayer = null
 
         isMusicPlaying = false
-        binding.playBtn.text = "재생" // 버튼 텍스트를 "재생"으로 변경
     }
 }

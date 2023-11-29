@@ -64,12 +64,12 @@
             android:text="이전">
         </Button>
         <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/baseline_not_started_24"
+            android:background="@drawable/baseline_play_circle_24"
             android:backgroundTint="#6C5CE7"
-            android:layout_margin="10dp"
+            android:layout_margin="20dp"
             android:id="@+id/play_btn"
             >
         </androidx.appcompat.widget.AppCompatButton>
