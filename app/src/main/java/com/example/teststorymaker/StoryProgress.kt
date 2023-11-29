@@ -1,5 +1,7 @@
 package com.example.teststorymaker
 
+import android.media.AudioManager
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +15,9 @@ import java.io.FileReader
 import java.io.IOException
 
 class StoryProgress : AppCompatActivity() {
+    private var isMusicPlaying = false
+    private var mediaPlayer: MediaPlayer? = null
+
     lateinit var binding: ActivityStoryProgressBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +68,10 @@ class StoryProgress : AppCompatActivity() {
                 if(currentPage == 0)
                     binding.previousBtn.isEnabled = false
                 binding.nextBtn.isEnabled = true
+                if (isMusicPlaying) {
+                    // If music is playing, stop playback
+                    stopMusic()
+                }
 
             }
             binding.nextBtn.setOnClickListener {
@@ -74,6 +83,20 @@ class StoryProgress : AppCompatActivity() {
                 if(currentPage == pageList.size-1)
                     binding.nextBtn.isEnabled = false
                 binding.previousBtn.isEnabled = true
+                if (isMusicPlaying) {
+                    // If music is playing, stop playback
+                    stopMusic()
+                }
+            }
+            binding.playBtn.setOnClickListener{
+                if (isMusicPlaying) {
+                    // If music is playing, stop playback
+                    stopMusic()
+                } else {
+                    // If music is not playing, start playback
+                    startMusic(pageList[currentPage].music)
+                }
+
             }
         }
         else{
@@ -114,5 +137,33 @@ class StoryProgress : AppCompatActivity() {
                 .load(file)
                 .into(binding.storyImage)
         }
+    }
+    private fun startMusic(musicUrl: String) {
+        mediaPlayer = MediaPlayer()
+        mediaPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
+
+        try {
+            mediaPlayer?.setDataSource(musicUrl)
+            mediaPlayer?.prepare()
+
+            // 반복재생을 설정합니다.
+            mediaPlayer?.isLooping = true
+
+            mediaPlayer?.start()
+
+            isMusicPlaying = true
+            binding.playBtn.text = "중지" // 버튼 텍스트를 "중지"로 변경
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun stopMusic() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        isMusicPlaying = false
+        binding.playBtn.text = "재생" // 버튼 텍스트를 "재생"으로 변경
     }
 }

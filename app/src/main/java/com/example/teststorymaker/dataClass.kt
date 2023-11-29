@@ -42,9 +42,11 @@ data class StoryResponse(
 
 data class ContentItem(
     val image: String,
-    val detail: String
+    val detail: String,
+    val music: String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!
     ) {
@@ -53,6 +55,7 @@ data class ContentItem(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(image)
         parcel.writeString(detail)
+        parcel.writeString(music)
     }
 
     override fun describeContents(): Int {
